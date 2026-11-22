@@ -1,0 +1,6 @@
+{
+  "source": "~/.obsidian/USD",
+  "target": "content",
+  "ignoreFolders": ["_Old", ".obsidian", ".trash"],
+  "ignoreFiles": []
+}

@@ -1,3 +1,594 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// ============================================================================
+// ui-mockup.html に寄せた見た目
+// ページ枠は quartz/components/frames/NotesFrame.tsx（data-frame="notes"）
+// ============================================================================
+
+:root {
+  --nf-surface: #ffffff; // 上部バー・カード
+  --nf-subtle: #eef0ed; // 表の見出し・インラインコード
+  --nf-tag-bg: #e8ebe7;
+  --nf-muted: #5a635f; // 補助テキスト
+}
+:root[saved-theme="dark"] {
+  --nf-surface: #1b201e;
+  --nf-subtle: #232926;
+  --nf-tag-bg: #2a312d;
+  --nf-muted: #9aa49f;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+// ---------------------------------------------------------------- グリッド
+.page[data-frame="notes"] {
+  max-width: 1440px;
+
+  & > #quartz-body {
+    padding: 0;
+    column-gap: 0;
+    row-gap: 0;
+    grid-template-columns: 280px minmax(0, 1fr) 300px;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "nf-topbar nf-topbar nf-topbar"
+      "grid-sidebar-left grid-center grid-sidebar-right"
+      "grid-sidebar-left grid-footer grid-sidebar-right";
+
+    @media all and ($tablet) {
+      padding: 0;
+      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto;
+      grid-template-areas:
+        "nf-topbar nf-topbar"
+        "grid-sidebar-left grid-center"
+        "grid-sidebar-left grid-sidebar-right"
+        "grid-sidebar-left grid-footer";
+    }
+    @media all and ($mobile) {
+      padding: 0;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto;
+      grid-template-areas:
+        "grid-sidebar-left nf-topbar"
+        "grid-center grid-center"
+        "grid-sidebar-right grid-sidebar-right"
+        "grid-footer grid-footer";
+    }
+
+    & > .center {
+      grid-area: grid-center;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 40px 56px 96px;
+      @media all and ($tablet) {
+        padding: 32px 40px 64px;
+      }
+      @media all and ($mobile) {
+        padding: 20px 20px 32px;
+      }
+      & > * {
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      & > hr {
+        display: none;
+      }
+    }
+
+    // ---------------------------------------------------------- 上部バー
+    & > .nf-topbar {
+      grid-area: nf-topbar;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px 28px;
+      padding: 14px 32px;
+      background: var(--nf-surface);
+      border-bottom: 1px solid var(--lightgray);
+      // 背景と下線だけ画面の端まで伸ばす
+      box-shadow: 0 0 0 100vmax var(--nf-surface);
+      clip-path: inset(0 -100vmax 0 -100vmax);
+      position: relative;
+      z-index: 2;
+
+      @media all and ($mobile) {
+        flex-wrap: nowrap;
+        gap: 4px;
+        height: 56px;
+        padding: 0 6px 0 0;
+        box-sizing: border-box;
+        clip-path: inset(0 -100vmax 0 0);
+      }
+    }
+
+    & .nf-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      color: var(--dark);
+      background: none;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      & svg {
+        color: var(--secondary);
+        flex: none;
+      }
+      @media all and ($mobile) {
+        flex: 1 1 auto;
+        font-size: 16px;
+        gap: 8px;
+        & svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    & .nf-topbar .search {
+      flex: 1 1 280px;
+      max-width: 460px;
+      @media all and ($mobile) {
+        flex: none;
+      }
+    }
+    & .nf-topbar .search-button {
+      height: 44px;
+      margin: 0;
+      padding: 0 14px;
+      gap: 10px;
+      background: var(--light);
+      border: 1px solid var(--lightgray);
+      border-radius: 8px;
+      color: var(--nf-muted);
+      font-size: 15px;
+      & p {
+        flex: 1 1 auto;
+        text-align: left;
+      }
+      &::after {
+        content: "/";
+        font-family: var(--codeFont);
+        font-size: 12px;
+        line-height: 20px;
+        padding: 0 6px;
+        border: 1px solid var(--lightgray);
+        border-radius: 4px;
+      }
+      @media all and ($mobile) {
+        width: 44px;
+        padding: 0;
+        justify-content: center;
+        background: transparent;
+        border: 0;
+        & p,
+        &::after {
+          display: none;
+        }
+      }
+    }
+    & .nf-topbar .darkmode {
+      margin: 0;
+      flex: none;
+    }
+
+    & .nf-build {
+      margin-left: auto;
+      font-family: var(--codeFont);
+      font-size: 13px;
+      color: var(--nf-muted);
+      @media all and ($mobile) {
+        display: none;
+      }
+    }
+
+    // ---------------------------------------------------------- 左：EXPLORER・TAGS
+    // 左列の区切り線（サイドバー自体は画面の高さで止まるので、線はグリッド側に引く）
+    @media all and not ($mobile) {
+      background: linear-gradient(var(--lightgray), var(--lightgray)) no-repeat;
+      background-size: 1px 100%;
+      background-position: 279px 0;
+    }
+    @media all and ($tablet) {
+      background-position: 259px 0;
+    }
+
+    & > .sidebar.left {
+      padding: 28px 16px 40px 24px;
+      gap: 0;
+      font-size: 14px;
+      line-height: 1.5;
+
+      @media all and ($mobile) {
+        padding: 0 0 0 6px;
+        min-height: 0;
+        border: 0;
+        align-items: center;
+        background: var(--nf-surface);
+        border-bottom: 1px solid var(--lightgray);
+        height: 56px;
+        box-sizing: border-box;
+        & .nf-tags {
+          display: none;
+        }
+      }
+    }
+
+    & .explorer {
+      @media all and not ($mobile) {
+        flex: none;
+      }
+      & .title-button h2 {
+        font-family: var(--codeFont);
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        color: var(--nf-muted);
+        margin: 0;
+      }
+      & .title-button {
+        padding: 0 8px 10px;
+      }
+      & .explorer-content ul.explorer-ul {
+        padding-left: 0;
+      }
+      & .folder-container {
+        min-height: 36px;
+        padding: 0 8px;
+        border-radius: 6px;
+      }
+      & .folder-title,
+      & .folder-button {
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--dark);
+      }
+      & li > a,
+      & .nav-file-title {
+        display: block;
+        padding: 7px 10px;
+        border-radius: 6px;
+        color: var(--dark);
+        opacity: 1;
+        font-weight: 400;
+        &.active {
+          color: var(--secondary);
+          font-weight: 500;
+          background: var(--highlight);
+          // Explorer は表示時に .active へ scrollIntoView する。上部バーがあるとページごと
+          // 下にずれて開くので、余白を大きく取ってスクロール量を 0 に抑える
+          scroll-margin-top: 100vh;
+        }
+        &:hover {
+          color: var(--secondary);
+        }
+      }
+      & .folder-outer > ul {
+        margin: 2px 0 6px 15px;
+        padding-left: 12px;
+        border-left: 1px solid var(--lightgray);
+      }
+    }
+
+    & .nf-label,
+    & .toc-header h3,
+    & .graph > h3,
+    & .backlinks > h3 {
+      font-family: var(--codeFont);
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--nf-muted);
+      margin: 0;
+    }
+
+    & .nf-tags {
+      .nf-label {
+        padding: 28px 8px 10px;
+      }
+    }
+    & .nf-tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 8px;
+    }
+    & .nf-tag {
+      font-family: var(--codeFont);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--darkgray);
+      background: var(--nf-tag-bg);
+      border-radius: 4px;
+      padding: 3px 8px;
+      text-decoration: none;
+      &:hover {
+        color: var(--secondary);
+      }
+    }
+
+    // ---------------------------------------------------------- 右：目次・グラフ・バックリンク
+    & > .sidebar.right {
+      padding: 40px 24px 40px 8px;
+      gap: 32px;
+      font-size: 14px;
+      line-height: 1.55;
+      @media all and not ($desktop) {
+        padding: 0 20px 32px;
+        & > * {
+          max-height: none;
+        }
+      }
+      @media all and ($tablet) {
+        padding: 0 40px 32px;
+      }
+    }
+
+    & .toc {
+      & .toc-header {
+        padding-bottom: 10px;
+      }
+      & .toc-content {
+        border-left: 1px solid var(--lightgray);
+        & li > a {
+          display: block;
+          padding: 5px 12px;
+          margin-left: -1px;
+          border-left: 2px solid transparent;
+          color: var(--darkgray);
+          opacity: 1;
+          &.in-view {
+            border-left-color: var(--secondary);
+            color: var(--secondary);
+          }
+        }
+      }
+    }
+
+    & .graph {
+      & > h3 {
+        padding-bottom: 10px;
+      }
+      & .graph-outer {
+        background: var(--nf-surface);
+        border: 1px solid var(--lightgray);
+        border-radius: 8px;
+      }
+    }
+
+    & .backlinks {
+      & > h3 {
+        padding-bottom: 10px;
+      }
+      & > ul {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0;
+        margin: 0;
+        & > li {
+          list-style: none;
+          margin: 0;
+          & > a {
+            display: block;
+            padding: 10px 12px;
+            border: 1px solid var(--lightgray);
+            border-radius: 8px;
+            background: var(--nf-surface);
+            color: var(--dark);
+            font-weight: 500;
+            &:hover {
+              border-color: var(--secondary);
+            }
+          }
+        }
+      }
+    }
+
+    & > footer {
+      padding: 24px 32px 40px;
+      font-size: 13px;
+      color: var(--nf-muted);
+      opacity: 1;
+      @media all and ($mobile) {
+        padding: 16px 20px 32px;
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------- 記事の頭
+.page[data-frame="notes"] {
+  & .page-header {
+    margin: 0;
+  }
+
+  & .breadcrumb-container {
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--nf-muted);
+    & .breadcrumb-element {
+      gap: 8px;
+      & p {
+        margin: 0;
+        color: var(--gray);
+      }
+      & a {
+        color: var(--nf-muted);
+        background: none;
+        font-weight: 400;
+      }
+    }
+  }
+
+  & h1.article-title {
+    margin: 12px 0 16px;
+    font-size: 36px;
+    line-height: 1.35;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    @media all and ($mobile) {
+      margin: 8px 0 12px;
+      font-size: 28px;
+    }
+  }
+
+  & .nf-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--lightgray);
+    font-family: var(--codeFont);
+    font-size: 13px;
+    color: var(--nf-muted);
+    @media all and ($mobile) {
+      gap: 4px 12px;
+      font-size: 12px;
+      padding-bottom: 18px;
+    }
+  }
+  & .nf-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    & a.tag-link {
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      color: var(--secondary);
+      font-family: var(--codeFont);
+      font-size: inherit;
+    }
+  }
+
+  // ---------------------------------------------------------- 本文
+  & article {
+    font-size: 16px;
+    line-height: 1.8;
+    @media all and ($mobile) {
+      font-size: 15px;
+    }
+
+    & h2 {
+      margin: 40px 0 8px;
+      font-size: 24px;
+      line-height: 1.4;
+      font-weight: 700;
+      @media all and ($mobile) {
+        margin: 32px 0 6px;
+        font-size: 20px;
+      }
+    }
+    & h3 {
+      margin: 24px 0 4px;
+      font-size: 18px;
+      font-weight: 700;
+      @media all and ($mobile) {
+        font-size: 16px;
+      }
+    }
+    & p {
+      margin: 0.6em 0;
+    }
+
+    & a.internal {
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      font-weight: 400;
+      color: var(--secondary);
+      text-decoration: underline dotted;
+      text-underline-offset: 4px;
+      &.broken {
+        color: var(--nf-muted);
+        opacity: 1;
+      }
+    }
+
+    & code:not(pre code) {
+      font-size: 13px;
+      background: var(--nf-subtle);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
+    & .table-container {
+      border: 1px solid var(--lightgray);
+      border-radius: 8px;
+      background: var(--nf-surface);
+      & > table {
+        margin: 0;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+      & th {
+        background: var(--nf-subtle);
+        font-weight: 500;
+        text-align: left;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--lightgray);
+      }
+      & td {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--nf-tag-bg);
+      }
+      & tr:last-child td {
+        border-bottom: 0;
+      }
+      & tr {
+        border: 0;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------- 前後のメモ
+  & .nf-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--lightgray);
+    & a {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 0 1 auto;
+      min-width: 200px;
+      padding: 12px 16px;
+      border: 1px solid var(--lightgray);
+      border-radius: 8px;
+      background: var(--nf-surface);
+      color: var(--dark);
+      text-decoration: none;
+      &:hover {
+        border-color: var(--secondary);
+      }
+    }
+    & .nf-next {
+      margin-left: auto;
+      text-align: right;
+    }
+    & .nf-pager-label {
+      font-size: 12px;
+      color: var(--nf-muted);
+    }
+    & .nf-pager-title {
+      font-weight: 500;
+    }
+  }
+}
