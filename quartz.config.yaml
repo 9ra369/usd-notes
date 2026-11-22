@@ -6,8 +6,8 @@ configuration:
   enablePopovers: true
   analytics: null
   locale: ja-JP
-  # TODO: Cloudflare Pages のプロジェクトを作ったら、実際の URL に合わせる
-  baseUrl: usd-notes.pages.dev
+  # 公開先（Cloudflare Workers）。独自ドメインにしたらここも変える
+  baseUrl: usd-notes.kurama0724.workers.dev
   # content/ は scripts/sync-notes.mjs が作る。除外したいフォルダーは sync.config.json の ignoreFolders に書く
   ignorePatterns:
     - private

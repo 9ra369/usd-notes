@@ -66,7 +66,7 @@ updated: 2026-11-20
 
 1. Obsidian でメモを書く。
 2. `node scripts/publish.mjs` を実行する（同期 → `content/` だけ commit → push）。
-3. Cloudflare Pages が自動でビルドし、サイトに反映される。
+3. Cloudflare（Workers）が自動でビルドし、サイトに反映される。
 
 ### 手元で確認する
 
@@ -84,14 +84,17 @@ npx quartz build --serve
 - 色とフォント：`quartz.config.yaml` の `theme`。
 - 細かい見た目：`quartz/styles/custom.scss`。
 
-### Cloudflare Pages の設定
+### Cloudflare の設定
+
+- 公開先：<https://usd-notes.kurama0724.workers.dev/>（Cloudflare **Workers** の静的アセットとして配信。GitHub の `main` に push すると自動でビルド）
+- 配信の設定は `wrangler.jsonc`（出力先 `public/`、無いページは `404.html`）。
+- ダッシュボード側のビルドコマンドは次のとおりにしておく。
 
 | 項目 | 値 |
 | --- | --- |
 | Production branch | `main` |
-| Framework preset | None |
 | Build command | `git fetch --unshallow && npx quartz plugin install && npx quartz build` |
-| Build output directory | `public` |
+| Deploy command | `npx wrangler deploy` |
 
 - Node のバージョンは `.node-version` から読まれる。
 - `git fetch --unshallow` は、更新日を git の履歴から取るため。

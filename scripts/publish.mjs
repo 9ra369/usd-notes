@@ -1,4 +1,4 @@
-// メモを同期して、GitHub に push する（push すると Cloudflare Pages が自動でビルドする）。
+// メモを同期して、GitHub に push する（push すると Cloudflare が自動でビルドする）。
 //   node scripts/publish.mjs
 // content/ 以外の変更（設定やデザイン）は含めない。それらは普段どおり git で commit する。
 
@@ -26,4 +26,4 @@ const stamp = new Intl.DateTimeFormat("sv-SE", {
 }).format(new Date())
 run("git", ["commit", "-m", `notes: 同期 ${stamp}`, "--", "content"])
 run("git", ["push"])
-console.log("push しました。数分で Cloudflare Pages に反映されます。")
+console.log("push しました。数分で Cloudflare に反映されます。")

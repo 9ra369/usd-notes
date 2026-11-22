@@ -1,0 +1,12 @@
+// Cloudflare Workers の設定（静的サイトとして public/ を配信する）
+{
+  "name": "usd-notes",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./public",
+    // 無いページには Quartz の 404.html を返す
+    "not_found_handling": "404-page",
+    // /structure/02_sdf-vs-usd → 02_sdf-vs-usd.html のように、拡張子なしの URL で開けるようにする
+    "html_handling": "auto-trailing-slash"
+  }
+}
